@@ -1,18 +1,17 @@
-#include "Field.hpp"
-#include "widget_szabalyzo.hpp"
-#include "gomb.hpp"
+#include "field.hpp"
+#include "button.hpp"
 #include "graphics.hpp"
-#include "widget_kijelzo.hpp"
+#include "widget.hpp"
 
 using namespace genv;
 using namespace std;
 
-gomb::gomb(int x_, int y_, int hossz_, int vastagsag_,int keret_, widget_kijelzo *kotve_):widget_szabalyzo(x_,y_,hossz_,vastagsag_,keret_,kotve_)
+field::field(int x_, int y_, int xSize_,int ySize_, int frame_):button(x_,y_,xSize_,ySize_, frame_)
 {
 }
-void gomb::rajzol()
+void field::draw()
 {
 }
-void gomb::szabalyoz(event ev,widget_kijelzo &kij)
+void field::action(event ev)
 {
 }

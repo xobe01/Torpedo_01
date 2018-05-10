@@ -1,16 +1,14 @@
 #ifndef WINDOW_HPP_INCLUDED
 #define WINDOW_HPP_INCLUDED
 #include <vector>
-#include "widget_kijelzo.hpp"
-#include "widget_szabalyzo.hpp"
+#include "widget.hpp"
 
 using namespace std;
 
 class window
 {
 protected:
-    vector <widget_szabalyzo*> szabalyzok;
-    vector <widget_kijelzo*> kijelzok;
+    vector <widget*> widgets;
 public:
     window();
 };

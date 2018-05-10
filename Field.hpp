@@ -1,15 +1,14 @@
 #ifndef FIELD_HPP_INCLUDED
 #define FIELD_HPP_INCLUDED
 
-using namespace genv;
+#include "graphics.hpp"
+#include "button.hpp"
 
-class Field : public gomb
+class field : public button
 {
 public:
-
-    gomb(int x_, int y_, int hossz_, int vastagsag_,int keret_, widget_kijelzo *kotve_);
-    virtual void rajzol();
-    virtual void szabalyoz(event ev, widget_kijelzo &kij);
+    field(int x_, int y_, int xSize_, int ySize_,int frame_);
+    virtual void action(event ev);
+    virtual void draw()=0;
 };
-
 #endif // FIELD_HPP_INCLUDED

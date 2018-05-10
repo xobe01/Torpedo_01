@@ -1,5 +1,7 @@
 #include "graphics.hpp"
 #include "window.hpp"
+#include "field.hpp"
+#include "gameController.hpp"
 #include <vector>
 
 using namespace genv;
@@ -14,39 +16,6 @@ void background()
     gout<<move_to(90,180)<<color(0,150,255)<<box(Square,Square);
     gout<<move_to(510,180)<<color(0,150,255)<<box(Square,Square);
 }
-class gameController
-{
-protected:
-    vector<int>playerFieldStatus();
-    vector<int>enemyFieldStatus();
-public:
-    gameController()
-    {
-        playerFieldStatus=new vector<int>();
-        enemyFieldStatus()=new vector<int>();
-    }
-    //0 - empty, untouched field
-    //1 - ship placed, untouched field
-    //2 - empty, already hit field
-    //3 - ship placed, already hit field
-    bool hit(int i)
-    {
-        if(enemyFieldStatus[i]==0)
-        {
-            enemyFieldStatus[i]=2;
-            return true;
-        }
-        if(enemyFieldStatus[i]==1)
-        {
-            enemyFieldStatus[i]=3;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-};
 class myWindow : public window
 {
 public:
@@ -60,15 +29,10 @@ public:
         while(gin >> ev)
         {
             background();
-            for(widget_kijelzo* kij : kijelzok)
+            for(widget* wid : widgets)
             {
-                kij->mukodtet(ev);
-                kij->rajzol();
-            }
-            for(widget_szabalyzo* szab : szabalyzok)
-            {
-                szab->szabalyoz(ev,*szab->get_kotve());
-                szab->rajzol();
+                wid->action(ev);
+                wid->draw();
             }
             gout<<refresh;
         }
