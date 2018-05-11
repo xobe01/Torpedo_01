@@ -51,3 +51,11 @@ void field::draw(int enemyValue)
 void field::action(event ev)
 {
 }
+int field::getLength()
+{
+
+}
+bool field::isSelected(int xMouse,int yMouse)
+{
+    return xMouse>x && xMouse<x+side && yMouse>y && yMouse<y+side;
+}

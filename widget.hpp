@@ -4,12 +4,13 @@
 
 class widget {
 protected:
-    int x, y, side,frame;
+    int x,y,side,frame;
 
 public:
     widget(int x_, int y_, int side_,int frame_);
-    virtual bool isSelected(int xMouse, int yMouse);
+    virtual bool isSelected(int xMouse, int yMouse)=0;
     virtual void draw(int i)=0;
     virtual void action(genv::event ev)=0;
+    virtual int getLength()=0;
 };
 #endif // WIDGET_HPP_INCLUDED

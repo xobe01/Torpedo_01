@@ -9,11 +9,14 @@ using namespace std;
 
 gameController::gameController(int N_):N(N_)
 {
-    vector <vector<int>>ships(4);
-    vector<int>vec(N,0);
-    enemyFieldStatus=vec;
-    playerFieldStatus=vec;
+    vector <vector<int>>ships(5);
+    vector<int>fields(N,0);
+    vector<bool>place(5,false);
+    enemyFieldStatus=fields;
+    playerFieldStatus=fields;
     enemyShipStatus=ships;
+    playerShipStatus=ships;
+    placed=place;
 }
     //0 - empty, untouched field
     //1 - ship placed, untouched field
@@ -44,12 +47,73 @@ int gameController::getPlayerValue(int i)
 {
     return playerFieldStatus[i];
 }
+bool gameController::placingPlayerShips(int i,int first, int direction, int length)
+{
+    //direction 0 - horizontal
+    //direction 1 - vertical
+    if(direction==0 && (first+length-1)%10>=length-1)
+    {
+        bool fieldIsEmpty=true;
+        for(int i=0;i<length;i++)
+        {
+            if(playerFieldStatus[first+i]!=0)
+            {
+                fieldIsEmpty=false;
+            }
+        }
+        if(fieldIsEmpty)
+        {
+            playerShipStatus[i].push_back(length);
+            playerShipStatus[i].push_back(direction);
+            for(int i=0;i<length;i++)
+            {
+                playerFieldStatus[first+i]=1;
+                playerShipStatus[i].push_back(first+i);
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    if(direction==1 && first<N-length*10)
+    {
+        bool fieldIsEmpty=true;
+        for(int i=0;i<length;i++)
+        {
+            if(playerFieldStatus[first+i*10]!=0)
+            {
+                fieldIsEmpty=false;
+            }
+        }
+        if(fieldIsEmpty)
+        {
+            playerShipStatus[i].push_back(length);
+            playerShipStatus[i].push_back(direction);
+            for(int i=0;i<length;i++)
+            {
+                playerFieldStatus[first+i*10]=1;
+                playerShipStatus[i].push_back(first+i*10);
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
 void gameController::placingEnemyShips()
 {
     srand(time(NULL));
-    for(int j=0;j<4;j++)
+    for(int j=0;j<5;j++)
     {
         int length=j+2;
+        if(j>1)
+        {
+            length--;
+        }
         bool done=false;
         while(!done)
         {
@@ -122,4 +186,54 @@ vector<vector<int>> gameController::getShipNumber()
     //2. element - direction
     //others - coordinates
     return enemyShipStatus;
+}
+void gameController::place(int i)
+{
+    placed[i]=true;
+}
+bool gameController::isPlaced(int i)
+{
+    return placed[i];
+}
+void gameController::AI()
+{
+    bool hasTarget=false;
+    for(int i=0;i<playerShipStatus.size();i++)
+    {
+        bool isOne=false;
+        bool isZero=false;
+        for(int j=2;j<playerShipStatus[i].size();j++)
+        {
+            if(playerShipStatus[i][j]==0)
+            {
+                isZero=true;
+            }
+            if(playerShipStatus[i][j]==1)
+            {
+                isOne=true;
+            }
+        }
+        if(isZero && isOne)
+        {
+            hasTarget=true;
+            break;
+        }
+    }
+    int target;
+    bool done=false;
+    while(!done)
+    {
+        if(!hasTarget)
+        {
+            target=rand()%N;
+            if(hit(target))
+            {
+                done=true;
+            }
+        }
+        else
+        {
+
+        }
+    }
 }

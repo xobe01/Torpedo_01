@@ -5,7 +5,7 @@
 using namespace genv;
 using namespace std;
 
-ship::ship(int x_, int y_, int side_, int frame_,int length_,int direction_):widget(x_,y_,side_, frame_),length(length_),direction(direction_)
+ship::ship(int x_, int y_, int side_, int frame_,int length_,int direction_):widget(x_,y_,side_, frame_),direction(direction_),length(length_)
 {
 }
 void ship::draw(int visible)
@@ -24,4 +24,19 @@ void ship::draw(int visible)
 }
 void ship::action(event ev)
 {
+}
+int ship::getLength()
+{
+    return length;
+}
+bool ship::isSelected(int xMouse, int yMouse)
+{
+    if(direction==0)
+    {
+        return xMouse>x && xMouse<x+side*length && yMouse>y && yMouse<y+side;
+    }
+    else
+    {
+        return xMouse>x && xMouse<x+side && yMouse>y && yMouse<y+side*length;
+    }
 }
