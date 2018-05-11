@@ -5,9 +5,8 @@
 using namespace genv;
 using namespace std;
 
-ship::ship(int x_, int y_, int side_, int frame_,int length_):widget(x_,y_,side_, frame_),length(length_)
+ship::ship(int x_, int y_, int side_, int frame_,int length_,int direction_):widget(x_,y_,side_, frame_),length(length_),direction(direction_)
 {
-    direction=0;
 }
 void ship::draw(int visible)
 {
