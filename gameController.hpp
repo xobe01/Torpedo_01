@@ -15,12 +15,12 @@ protected:
     int N;
 public:
     gameController(int N_);
-    virtual bool hit(int i);
-    virtual int getEnemyValue(int i);
-    virtual int getPlayerValue(int i);
+    virtual bool hit(int i,bool isPlayerTurn);
+    virtual vector<int> getEnemyValue();
+    virtual vector<int> getPlayerValue();
     virtual void placingEnemyShips();
     virtual bool placingPlayerShips(int i,int first, int direction, int length);
-    virtual bool whichSank(int i);
+    virtual bool whichSank(int i,bool isPlayer);
     virtual vector<vector<int>> getShipNumber();
     virtual void place(int i);
     virtual bool isPlaced(int i);

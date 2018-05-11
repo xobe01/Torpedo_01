@@ -62,7 +62,9 @@ public:
         int number=0;
         bool canPlace=false;
         int whichShip=0;
-        while(gin >> ev)
+        bool playersTurn=true;
+        bool endGame=false;
+        while(gin >> ev && ev.keycode!=key_escape)
         {
             if(!startGame)
             {
@@ -106,25 +108,64 @@ public:
             }
             else
             {
-                for(int i=0;i<enemyShips.size();i++)
+                if(!endGame)
                 {
-                    enemyShips[i]->draw(controller->whichSank(i));
-                }
-                for(int i=0;i<enemyFields.size();i++)
-                {
-                    if(ev.button==btn_left && enemyFields[i]->isSelected(ev.pos_x,ev.pos_y))
+                    if(playersTurn)
                     {
-                        controller->hit(i);
+                        if(ev.button==btn_left)
+                        {
+                            for(int i=0;i<enemyFields.size();i++)
+                            {
+                                if(enemyFields[i]->isSelected(ev.pos_x,ev.pos_y))
+                                {
+                                    controller->hit(i,true);
+                                    playersTurn=false;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        controller->AI();
+                        playersTurn=true;
+                    }
+                    int playerScore=0;
+                    for(int i=0;i<enemyShips.size();i++)
+                    {
+                        if(controller->whichSank(i,false))
+                        {
+                            playerScore++;
+                        }
+                    }
+                    if(playerScore==enemyShips.size())
+                    {
+                        endGame=true;
+                    }
+                    int enemyScore=0;
+                    for(int i=0;i<playerShips.size();i++)
+                    {
+                        if(controller->whichSank(i,true))
+                        {
+                            enemyScore++;
+                        }
+                    }
+                    if(enemyScore==playerShips.size())
+                    {
+                        endGame=true;
                     }
                 }
             }
+            for(int i=0;i<enemyShips.size();i++)
+            {
+                enemyShips[i]->draw(controller->whichSank(i,false));
+            }
             for(int i=0;i<enemyFields.size();i++)
             {
-                enemyFields[i]->draw(controller->getEnemyValue(i));
+                enemyFields[i]->draw(controller->getEnemyValue()[i]);
             }
             for(int i=0;i<playerFields.size();i++)
             {
-                playerFields[i]->draw(controller->getPlayerValue(i));
+                playerFields[i]->draw(controller->getPlayerValue()[i]);
             }
             for(int i=0;i<staticShips.size();i++)
             {
@@ -133,6 +174,13 @@ public:
             for(int i=0;i<playerShips.size();i++)
             {
                 playerShips[i]->draw(true);
+            }
+            for (int i=0;i<controller->getEnemyValue().size();i++)
+            {
+                if(controller->getPlayerValue()[i]==3)
+                {
+                    playerFields[i]->draw(controller->getPlayerValue()[i]);
+                }
             }
             gout<<refresh;
         }

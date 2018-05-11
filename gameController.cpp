@@ -22,8 +22,10 @@ gameController::gameController(int N_):N(N_)
     //1 - ship placed, untouched field
     //2 - empty, already hit field
     //3 - ship placed, already hit field
-bool gameController::hit(int i)
+bool gameController::hit(int i,bool isPlayerTurn)
 {
+    if(isPlayerTurn)
+    {
         if(enemyFieldStatus[i]==0)
         {
             enemyFieldStatus[i]=2 ;
@@ -38,14 +40,32 @@ bool gameController::hit(int i)
         {
             return false;
         }
+    }
+    else
+    {
+        if(playerFieldStatus[i]==0)
+        {
+            playerFieldStatus[i]=2 ;
+            return true;
+        }
+        if(playerFieldStatus[i]==1)
+        {
+            playerFieldStatus[i]=3;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }
-int gameController::getEnemyValue(int i)
+vector <int> gameController::getEnemyValue()
 {
-    return enemyFieldStatus[i];
+    return enemyFieldStatus;
 }
-int gameController::getPlayerValue(int i)
+vector <int> gameController::getPlayerValue()
 {
-    return playerFieldStatus[i];
+    return playerFieldStatus;
 }
 bool gameController::placingPlayerShips(int i,int first, int direction, int length)
 {
@@ -168,17 +188,32 @@ void gameController::placingEnemyShips()
         }
     }
 }
-bool gameController::whichSank(int i)
+bool gameController::whichSank(int i, bool isPlayer)
 {
-    bool isSunk=true;
-    for (int j=2;j<enemyShipStatus[i].size();j++)
+    if(isPlayer)
     {
-        if(enemyFieldStatus[enemyShipStatus[i][j]]==1)
+        bool isSunk=true;
+        for (int j=2;j<playerShipStatus[i].size();j++)
         {
-            isSunk=false;
+            if(playerFieldStatus[playerShipStatus[i][j]]==1)
+            {
+                isSunk=false;
+            }
         }
+        return isSunk;
     }
-    return isSunk;
+    else
+    {
+        bool isSunk=true;
+        for (int j=2;j<enemyShipStatus[i].size();j++)
+        {
+            if(enemyFieldStatus[enemyShipStatus[i][j]]==1)
+            {
+                isSunk=false;
+            }
+        }
+        return isSunk;
+    }
 }
 vector<vector<int>> gameController::getShipNumber()
 {
@@ -226,14 +261,18 @@ void gameController::AI()
         if(!hasTarget)
         {
             target=rand()%N;
-            if(hit(target))
+            if(hit(target,false))
             {
                 done=true;
             }
         }
         else
         {
-
+            target=rand()%N;
+            if(hit(target,false))
+            {
+                done=true;
+            }
         }
     }
 }
