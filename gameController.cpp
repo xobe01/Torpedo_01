@@ -3,8 +3,11 @@
 
 using namespace std;
 
-gameController::gameController(vector<int>playerFieldStatus_,vector<int>enemyFieldStatus_):playerFieldStatus(playerFieldStatus_),enemyFieldStatus(enemyFieldStatus_)
+gameController::gameController(int N)
 {
+    vector<int>vec(N,0);
+    enemyFieldStatus=vec;
+    playerFieldStatus=vec;
 }
     //0 - empty, untouched field
     //1 - ship placed, untouched field
@@ -12,9 +15,9 @@ gameController::gameController(vector<int>playerFieldStatus_,vector<int>enemyFie
     //3 - ship placed, already hit field
 bool gameController::hit(int i)
 {
-     if(enemyFieldStatus[i]==0)
+        if(enemyFieldStatus[i]==0)
         {
-            enemyFieldStatus[i]=2;
+            enemyFieldStatus[i]=2 ;
             return true;
         }
         if(enemyFieldStatus[i]==1)
@@ -26,4 +29,12 @@ bool gameController::hit(int i)
         {
             return false;
         }
+}
+int gameController::getEnemyValue(int i)
+{
+    return enemyFieldStatus[i];
+}
+int gameController::getPlayerValue(int i)
+{
+    return playerFieldStatus[i];
 }

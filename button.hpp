@@ -8,12 +8,10 @@ using namespace genv;
 
 class button : public widget
 {
-protected:
-    std::function<void()> functor;
 public:
 
-    button(int x_, int y_, int xSize_,int ySize_,int frame_);
-    virtual void draw();
+    button(int x_, int y_, int side_,int frame_);
+    virtual void draw(int i)=0;
     virtual void action(event ev);
 };
 

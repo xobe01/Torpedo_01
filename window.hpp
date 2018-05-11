@@ -8,7 +8,10 @@ using namespace std;
 class window
 {
 protected:
-    vector <widget*> widgets;
+    vector <widget*> playerFields;
+    vector <widget*> enemyFields;
+    vector <widget*> playerShips;
+    vector <widget*> enemyShips;
 public:
     window();
 };
