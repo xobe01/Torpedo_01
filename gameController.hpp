@@ -15,7 +15,8 @@ protected:
     int N;
 public:
     gameController(int N_);
-    virtual bool hit(int i,bool isPlayerTurn);
+    virtual void hit(int i,bool isPlayerTurn);
+    virtual bool isGoodTarget(int i, bool isPlayerTurn);
     virtual vector<int> getEnemyValue();
     virtual vector<int> getPlayerValue();
     virtual void placingEnemyShips();

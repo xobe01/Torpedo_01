@@ -22,7 +22,32 @@ gameController::gameController(int N_):N(N_)
     //1 - ship placed, untouched field
     //2 - empty, already hit field
     //3 - ship placed, already hit field
-bool gameController::hit(int i,bool isPlayerTurn)
+void gameController::hit(int i,bool isPlayerTurn)
+{
+    if(isPlayerTurn)
+    {
+        if(enemyFieldStatus[i]==0)
+        {
+            enemyFieldStatus[i]=2;
+        }
+        else if(enemyFieldStatus[i]==1)
+        {
+            enemyFieldStatus[i]=3;
+        }
+    }
+    else
+    {
+        if(playerFieldStatus[i]==0)
+        {
+            playerFieldStatus[i]=2;
+        }
+        else if(playerFieldStatus[i]==1)
+        {
+            playerFieldStatus[i]=3;
+        }
+    }
+}
+bool gameController::isGoodTarget(int i,bool isPlayerTurn)
 {
     if(i>N || i<0)
     {
@@ -34,12 +59,10 @@ bool gameController::hit(int i,bool isPlayerTurn)
         {
             if(enemyFieldStatus[i]==0)
             {
-                enemyFieldStatus[i]=2;
                 return true;
             }
             else if(enemyFieldStatus[i]==1)
             {
-                enemyFieldStatus[i]=3;
                 return true;
             }
             else
@@ -51,12 +74,10 @@ bool gameController::hit(int i,bool isPlayerTurn)
         {
             if(playerFieldStatus[i]==0)
             {
-                playerFieldStatus[i]=2;
                 return true;
             }
             else if(playerFieldStatus[i]==1)
             {
-                playerFieldStatus[i]=3;
                 return true;
             }
             else
@@ -260,15 +281,12 @@ void gameController::AI()
             if(playerFieldStatus[playerShipStatus[i][j]]==3)
             {
                 isThree=true;
-                cout<<playerFieldStatus[playerShipStatus[i][j]]<<" ";
             }
             else if(playerFieldStatus[playerShipStatus[i][j]]==1)
             {
                 isOne=true;
-                cout<<playerFieldStatus[playerShipStatus[i][j]]<<" ";
             }
         }
-        cout<<endl;
         if(isThree && isOne)
         {
             for(int j=2;j<playerShipStatus[i].size();j++)
@@ -287,8 +305,9 @@ void gameController::AI()
         if(targets.size()==0)
         {
             target=rand()%N;
-            if(hit(target,false))
+            if(isGoodTarget(target,false))
             {
+                hit(target,false);
                 done=true;
             }
         }
@@ -306,57 +325,33 @@ void gameController::AI()
                 {
                     if(targets[i]-targets[j]==10 && targets[i]/10>1)
                     {
-                        //cout<<"fel";
-                        /*if(hit(targets[i]+10,false))
+                         if(isGoodTarget(targets[j]-10,false))
                         {
-                            cout<<"done01";
-                            done=true;
-                        }*/
-                         if(hit(targets[j]-10,false))
-                        {
-                            //cout<<"done02";
+                            hit(targets[j]-10,false);
                             done=true;
                         }
                     }
                     else if(targets[i]-targets[j]==-10 && targets[i]/10<8)
                     {
-                        //cout<<"le";
-                        /*if(hit(targets[i]-10,false))
+                        if(isGoodTarget(targets[j]+10,false))
                         {
-                            cout<<"done01";
-                            done=true;
-                        }*/
-                        if(hit(targets[j]+10,false))
-                        {
-                          //  cout<<"done02";
+                            hit(targets[j]+10,false);
                             done=true;
                         }
                     }
                     else if(targets[i]-targets[j]==1 && targets[i]%10>1)
                     {
-                        //cout<<"balra";
-                        /*if(hit(targets[i]+1,false))
+                         if(isGoodTarget(targets[j]-1,false))
                         {
-                            cout<<"done01";
-                            done=true;
-                        }*/
-                         if(hit(targets[j]-1,false))
-                        {
-                          //  cout<<"done02";
+                            hit(targets[j]-1,false);
                             done=true;
                         }
                     }
                     else if(targets[i]-targets[j]==-1 && targets[i]%10<8)
                     {
-                        //cout<<"jobbra";
-                        /*if(hit(targets[i]-1,false))
+                        if(isGoodTarget(targets[j]+1,false))
                         {
-                            cout<<"done01 "<<hit(targets[i]-1,false)<<" "<<targets[i]-1<<" "<<targets[i]-1<<targets[i];
-                            done=true;
-                        }*/
-                        if(hit(targets[j]+1,false))
-                        {
-                          //  cout<<"done02";
+                            hit(targets[j]+1,false);
                             done=true;
                         }
                     }
@@ -380,23 +375,27 @@ void gameController::AI()
             while(i!=4)
             {
                 int direction=rand()%4;
-                if(direction==0 && target%10!=0 && hit(target-1,false))
+                if(direction==0 && target%10!=0 && isGoodTarget(target-1,false))
                 {
+                    hit(target-1,false);
                     done=true;
                     i=4;
                 }
-                else if(direction==1 && target%10!=9 && hit(target+1,false))
+                else if(direction==1 && target%10!=9 && isGoodTarget(target+1,false))
                 {
+                    hit(target+1,false);
                     done=true;
                     i=4;
                 }
-                else if(direction==2 && target/10!=0 && hit(target-10,false))
+                else if(direction==2 && target/10!=0 && isGoodTarget(target-10,false))
                 {
+                    hit(target-10,false);
                     done=true;
                     i=4;
                 }
-                else if(direction==3 && target/10!=9 && hit(target+10,false))
+                else if(direction==3 && target/10!=9 && isGoodTarget(target+10,false))
                 {
+                    hit(target+10,false);
                     done=true;
                     i=4;
                 }
@@ -407,18 +406,4 @@ void gameController::AI()
             }
         }
     }
-    for(int i=0;i<targets.size();i++)
-    {
-        cout<<targets[i]<<" ";
-    }
-    cout<<endl;
-    for(int i=0;i<10;i++)
-    {
-        for(int j=0;j<10;j++)
-        {
-            cout<<playerFieldStatus[i*10+j]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
 }
