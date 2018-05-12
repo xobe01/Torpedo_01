@@ -4,13 +4,18 @@
 #include "graphics.hpp"
 #include "button.hpp"
 
-class field : public button
+class field : public widget
 {
 public:
     field(int x_, int y_, int side_,int frame_);
     virtual void action(event ev);
-    virtual void draw(int enemyValue);
+    virtual void draw();
+    virtual void drawAction(int enemyValue);
     virtual int getLength();
     virtual bool isSelected(int xMouse,int yMouse);
+    virtual void beSelected();
+    virtual void dontBeSelected();
+    virtual int getX();
+    virtual int getY();
 };
 #endif // FIELD_HPP_INCLUDED

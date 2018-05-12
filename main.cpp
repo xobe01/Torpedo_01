@@ -13,6 +13,11 @@ using namespace std;
 const int XX=950;
 const int YY=600;
 
+void background()
+{
+    gout<<move_to(0,0)<<color(0,0,0)<<box(XX,YY);
+}
+
 class myWindow : public window
 {
 protected:
@@ -36,15 +41,15 @@ public:
                 enemyFields.push_back(f);
             }
         }
-        ship* staticShip_01 = new ship(50,100,40,2,3,0);
+        ship* staticShip_01 = new ship(50,100,40,5,3,0);
         staticShips.push_back(staticShip_01);
-        ship* staticShip_02 = new ship(210,100,40,2,3,0);
+        ship* staticShip_02 = new ship(210,100,40,5,3,0);
         staticShips.push_back(staticShip_02);
-        ship* staticShip_03 = new ship(370,100,40,2,2,0);
+        ship* staticShip_03 = new ship(370,100,40,5,2,0);
         staticShips.push_back(staticShip_03);
-        ship* staticShip_04 = new ship(50,50,40,2,4,0);
+        ship* staticShip_04 = new ship(50,50,40,5,4,0);
         staticShips.push_back(staticShip_04);
-        ship* staticShip_05 = new ship(250,50,40,2,5,0);
+        ship* staticShip_05 = new ship(250,50,40,5,5,0);
         staticShips.push_back(staticShip_05);
     }
     void event_loop()
@@ -52,7 +57,7 @@ public:
         controller->placingEnemyShips();
         for(int i=0;i<controller->getShipNumber().size();i++)
         {
-            ship* enemyShip = new ship(500+controller->getShipNumber()[i][2]%10*40,150+controller->getShipNumber()[i][2]/10*40,40,2,controller->getShipNumber()[i][0],controller->getShipNumber()[i][1]);
+            ship* enemyShip = new ship(500+controller->getShipNumber()[i][2]%10*40,150+controller->getShipNumber()[i][2]/10*40,40,5,controller->getShipNumber()[i][0],controller->getShipNumber()[i][1]);
             enemyShips.push_back(enemyShip);
         }
         event ev;
@@ -66,6 +71,7 @@ public:
         bool endGame=false;
         while(gin >> ev && ev.keycode!=key_escape)
         {
+            background();
             if(!startGame)
             {
                 if(ev.button==btn_right)
@@ -78,6 +84,11 @@ public:
                     {
                         if(staticShips[i]->isSelected(ev.pos_x,ev.pos_y) && !controller->isPlaced(i))
                         {
+                            for(int j=0;j<staticShips.size();j++)
+                            {
+                                staticShips[j]->dontBeSelected();
+                            }
+                             staticShips[i]->beSelected();
                              length=staticShips[i]->getLength();
                              canPlace=true;
                              whichShip=i;
@@ -85,9 +96,9 @@ public:
                     }
                     for(int i=0;i<playerFields.size();i++)
                     {
-                        if(playerFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->placingPlayerShips(number,i,direction,length) && canPlace)
+                        if(playerFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->placingPlayerShips(whichShip,i,direction,length,true) && canPlace)
                         {
-                            ship *playerShip=new ship(50+i%10*40,150+i/10*40,40,2,length,direction);
+                            ship *playerShip=new ship(50+i%10*40,150+i/10*40,40,5,length,direction);
                             playerShips.push_back(playerShip);
                             number++;
                             direction=0;
@@ -99,7 +110,7 @@ public:
                 }
                 for(int i=0;i<playerShips.size();i++)
                 {
-                    playerShips[i]->draw(true);
+                    playerShips[i]->draw();
                 }
                 if(number==5)
                 {
@@ -154,31 +165,50 @@ public:
                     }
                 }
             }
+            for(int i=0;i<enemyFields.size();i++)
+            {
+                enemyFields[i]->draw();
+            }
             for(int i=0;i<enemyShips.size();i++)
             {
-                enemyShips[i]->draw(controller->whichSank(i,false));
+                if(controller->whichSank(i,false))
+                {
+                    enemyShips[i]->draw();
+                }
             }
             for(int i=0;i<enemyFields.size();i++)
             {
-                enemyFields[i]->draw(controller->getEnemyValue()[i]);
+                enemyFields[i]->drawAction(controller->getEnemyValue()[i]);
             }
             for(int i=0;i<playerFields.size();i++)
             {
-                playerFields[i]->draw(controller->getPlayerValue()[i]);
+                playerFields[i]->draw();
             }
             for(int i=0;i<staticShips.size();i++)
             {
-                staticShips[i]->draw(true);
+                if(!controller->isPlaced(i))
+                {
+                    staticShips[i]->draw();
+                }
             }
             for(int i=0;i<playerShips.size();i++)
             {
-                playerShips[i]->draw(true);
+                playerShips[i]->draw();
             }
-            for (int i=0;i<controller->getEnemyValue().size();i++)
+            for(int i=0;i<playerFields.size();i++)
             {
-                if(controller->getPlayerValue()[i]==3)
+                playerFields[i]->drawAction(controller->getPlayerValue()[i]);
+            }
+            if(canPlace)
+            {
+                for(int i=0;i<playerFields.size();i++)
                 {
-                    playerFields[i]->draw(controller->getPlayerValue()[i]);
+                    if(playerFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->placingPlayerShips(0,i,direction,length,false))
+                    {
+                        ship* visual=new ship(playerFields[i]->getX(),playerFields[i]->getY(),40,5,length,direction);
+                        visual->draw();
+                        delete visual;
+                    }
                 }
             }
             gout<<refresh;

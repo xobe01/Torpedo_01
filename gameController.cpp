@@ -34,7 +34,7 @@ bool gameController::hit(int i,bool isPlayerTurn)
         {
             if(enemyFieldStatus[i]==0)
             {
-                enemyFieldStatus[i]=2 ;
+                enemyFieldStatus[i]=2;
                 return true;
             }
             else if(enemyFieldStatus[i]==1)
@@ -51,7 +51,7 @@ bool gameController::hit(int i,bool isPlayerTurn)
         {
             if(playerFieldStatus[i]==0)
             {
-                playerFieldStatus[i]=2 ;
+                playerFieldStatus[i]=2;
                 return true;
             }
             else if(playerFieldStatus[i]==1)
@@ -74,7 +74,7 @@ vector <int> gameController::getPlayerValue()
 {
     return playerFieldStatus;
 }
-bool gameController::placingPlayerShips(int shipNumber,int first, int direction, int length)
+bool gameController::placingPlayerShips(int shipNumber,int first, int direction, int length,bool isShip)
 {
     //direction 0 - horizontal
     //direction 1 - vertical
@@ -90,12 +90,15 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
         }
         if(fieldIsEmpty)
         {
-            playerShipStatus[shipNumber].push_back(length);
-            playerShipStatus[shipNumber].push_back(direction);
-            for(int i=0;i<length;i++)
+            if(isShip)
             {
-                playerFieldStatus[first+i]=1;
-                playerShipStatus[shipNumber].push_back(first+i);
+                playerShipStatus[shipNumber].push_back(length);
+                playerShipStatus[shipNumber].push_back(direction);
+                for(int i=0;i<length;i++)
+                {
+                    playerFieldStatus[first+i]=1;
+                    playerShipStatus[shipNumber].push_back(first+i);
+                }
             }
             return true;
         }
@@ -104,7 +107,7 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
             return false;
         }
     }
-    else if(direction==1 && first<N-length*10)
+    else if(direction==1 && first<N-(length-1)*10)
     {
         bool fieldIsEmpty=true;
         for(int i=0;i<length;i++)
@@ -116,12 +119,15 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
         }
         if(fieldIsEmpty)
         {
-            playerShipStatus[shipNumber].push_back(length);
+            if(isShip)
+            {
+                playerShipStatus[shipNumber].push_back(length);
             playerShipStatus[shipNumber].push_back(direction);
             for(int i=0;i<length;i++)
             {
                 playerFieldStatus[first+i*10]=1;
                 playerShipStatus[shipNumber].push_back(first+i*10);
+            }
             }
             return true;
         }
@@ -129,6 +135,10 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
         {
             return false;
         }
+    }
+    else
+    {
+        return false;
     }
 }
 void gameController::placingEnemyShips()
@@ -170,7 +180,7 @@ void gameController::placingEnemyShips()
                     done=true;
                 }
             }
-            else if(direction==1 && first<N-length*10)
+            else if(direction==1 && first<N-(length-1)*10)
             {
                 bool fieldIsEmpty=true;
                 for(int i=0;i<length;i++)
@@ -250,12 +260,15 @@ void gameController::AI()
             if(playerFieldStatus[playerShipStatus[i][j]]==3)
             {
                 isThree=true;
+                cout<<playerFieldStatus[playerShipStatus[i][j]]<<" ";
             }
             else if(playerFieldStatus[playerShipStatus[i][j]]==1)
             {
                 isOne=true;
+                cout<<playerFieldStatus[playerShipStatus[i][j]]<<" ";
             }
         }
+        cout<<endl;
         if(isThree && isOne)
         {
             for(int j=2;j<playerShipStatus[i].size();j++)
@@ -286,64 +299,64 @@ void gameController::AI()
         else if(targets.size()>1 && !randomTarget)
         {
             int i=0;
-            while(i<targets.size()-1 && !done )
+            while(i<targets.size() && !done )
             {
-                int j=i+1;
+                int j=0;
                 while(j<targets.size() && !done)
                 {
-                    if(targets[i]-targets[j]==10)
+                    if(targets[i]-targets[j]==10 && targets[i]/10>1)
                     {
-                        cout<<"fel";
-                        if(hit(targets[i]+10,false))
+                        //cout<<"fel";
+                        /*if(hit(targets[i]+10,false))
                         {
                             cout<<"done01";
                             done=true;
-                        }
-                        else if(hit(targets[j]-10,false))
+                        }*/
+                         if(hit(targets[j]-10,false))
                         {
-                            cout<<"done02";
+                            //cout<<"done02";
                             done=true;
                         }
                     }
-                    else if(targets[i]-targets[j]==-10)
+                    else if(targets[i]-targets[j]==-10 && targets[i]/10<8)
                     {
-                        cout<<"le";
-                        if(hit(targets[i]-10,false))
+                        //cout<<"le";
+                        /*if(hit(targets[i]-10,false))
                         {
                             cout<<"done01";
                             done=true;
-                        }
-                        else if(hit(targets[j]+10,false))
+                        }*/
+                        if(hit(targets[j]+10,false))
                         {
-                            cout<<"done02";
+                          //  cout<<"done02";
                             done=true;
                         }
                     }
-                    else if(targets[i]-targets[j]==1 && targets[i]%10!=0)
+                    else if(targets[i]-targets[j]==1 && targets[i]%10>1)
                     {
-                        cout<<"balra";
-                        if(hit(targets[i]+1,false))
+                        //cout<<"balra";
+                        /*if(hit(targets[i]+1,false))
                         {
                             cout<<"done01";
                             done=true;
-                        }
-                        else if(hit(targets[j]-1,false))
+                        }*/
+                         if(hit(targets[j]-1,false))
                         {
-                            cout<<"done02";
+                          //  cout<<"done02";
                             done=true;
                         }
                     }
-                    else if(targets[i]-targets[j]==-1 && targets[i]%10!=9)
+                    else if(targets[i]-targets[j]==-1 && targets[i]%10<8)
                     {
-                        cout<<"jobbra";
-                        if(hit(targets[i]-1,false))
+                        //cout<<"jobbra";
+                        /*if(hit(targets[i]-1,false))
                         {
-                            cout<<"done01 "<<hit(playerFieldStatus[targets[i]-1],false)<<" "<<playerFieldStatus[targets[i]-1]<<" "<<targets[i]-1<<targets[i];
+                            cout<<"done01 "<<hit(targets[i]-1,false)<<" "<<targets[i]-1<<" "<<targets[i]-1<<targets[i];
                             done=true;
-                        }
-                        else if(hit(targets[j]+1,false))
+                        }*/
+                        if(hit(targets[j]+1,false))
                         {
-                            cout<<"done02";
+                          //  cout<<"done02";
                             done=true;
                         }
                     }
@@ -394,4 +407,18 @@ void gameController::AI()
             }
         }
     }
+    for(int i=0;i<targets.size();i++)
+    {
+        cout<<targets[i]<<" ";
+    }
+    cout<<endl;
+    for(int i=0;i<10;i++)
+    {
+        for(int j=0;j<10;j++)
+        {
+            cout<<playerFieldStatus[i*10+j]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
 }
