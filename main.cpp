@@ -87,8 +87,8 @@ public:
                     {
                         if(playerFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->placingPlayerShips(number,i,direction,length) && canPlace)
                         {
-                            ship *staticShip=new ship(50+i%10*40,150+i/10*40,40,2,length,direction);
-                            playerShips.push_back(staticShip);
+                            ship *playerShip=new ship(50+i%10*40,150+i/10*40,40,2,length,direction);
+                            playerShips.push_back(playerShip);
                             number++;
                             direction=0;
                             length=0;
@@ -116,9 +116,8 @@ public:
                         {
                             for(int i=0;i<enemyFields.size();i++)
                             {
-                                if(enemyFields[i]->isSelected(ev.pos_x,ev.pos_y))
+                                if(enemyFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->hit(i,true))
                                 {
-                                    controller->hit(i,true);
                                     playersTurn=false;
                                 }
                             }
@@ -137,10 +136,6 @@ public:
                             playerScore++;
                         }
                     }
-                    if(playerScore==enemyShips.size())
-                    {
-                        endGame=true;
-                    }
                     int enemyScore=0;
                     for(int i=0;i<playerShips.size();i++)
                     {
@@ -149,7 +144,11 @@ public:
                             enemyScore++;
                         }
                     }
-                    if(enemyScore==playerShips.size())
+                    if(playerScore==enemyShips.size())
+                    {
+                        endGame=true;
+                    }
+                    else if(enemyScore==playerShips.size())
                     {
                         endGame=true;
                     }

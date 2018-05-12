@@ -19,7 +19,7 @@ public:
     virtual vector<int> getEnemyValue();
     virtual vector<int> getPlayerValue();
     virtual void placingEnemyShips();
-    virtual bool placingPlayerShips(int i,int first, int direction, int length);
+    virtual bool placingPlayerShips(int shipNumber,int first, int direction, int length);
     virtual bool whichSank(int i,bool isPlayer);
     virtual vector<vector<int>> getShipNumber();
     virtual void place(int i);

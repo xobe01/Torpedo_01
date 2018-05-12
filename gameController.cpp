@@ -31,7 +31,7 @@ bool gameController::hit(int i,bool isPlayerTurn)
             enemyFieldStatus[i]=2 ;
             return true;
         }
-        if(enemyFieldStatus[i]==1)
+        else if(enemyFieldStatus[i]==1)
         {
             enemyFieldStatus[i]=3;
             return true;
@@ -48,7 +48,7 @@ bool gameController::hit(int i,bool isPlayerTurn)
             playerFieldStatus[i]=2 ;
             return true;
         }
-        if(playerFieldStatus[i]==1)
+        else if(playerFieldStatus[i]==1)
         {
             playerFieldStatus[i]=3;
             return true;
@@ -67,7 +67,7 @@ vector <int> gameController::getPlayerValue()
 {
     return playerFieldStatus;
 }
-bool gameController::placingPlayerShips(int i,int first, int direction, int length)
+bool gameController::placingPlayerShips(int shipNumber,int first, int direction, int length)
 {
     //direction 0 - horizontal
     //direction 1 - vertical
@@ -83,12 +83,12 @@ bool gameController::placingPlayerShips(int i,int first, int direction, int leng
         }
         if(fieldIsEmpty)
         {
-            playerShipStatus[i].push_back(length);
-            playerShipStatus[i].push_back(direction);
+            playerShipStatus[shipNumber].push_back(length);
+            playerShipStatus[shipNumber].push_back(direction);
             for(int i=0;i<length;i++)
             {
                 playerFieldStatus[first+i]=1;
-                playerShipStatus[i].push_back(first+i);
+                playerShipStatus[shipNumber].push_back(first+i);
             }
             return true;
         }
@@ -97,7 +97,7 @@ bool gameController::placingPlayerShips(int i,int first, int direction, int leng
             return false;
         }
     }
-    if(direction==1 && first<N-length*10)
+    else if(direction==1 && first<N-length*10)
     {
         bool fieldIsEmpty=true;
         for(int i=0;i<length;i++)
@@ -109,12 +109,12 @@ bool gameController::placingPlayerShips(int i,int first, int direction, int leng
         }
         if(fieldIsEmpty)
         {
-            playerShipStatus[i].push_back(length);
-            playerShipStatus[i].push_back(direction);
+            playerShipStatus[shipNumber].push_back(length);
+            playerShipStatus[shipNumber].push_back(direction);
             for(int i=0;i<length;i++)
             {
                 playerFieldStatus[first+i*10]=1;
-                playerShipStatus[i].push_back(first+i*10);
+                playerShipStatus[shipNumber].push_back(first+i*10);
             }
             return true;
         }
@@ -163,7 +163,7 @@ void gameController::placingEnemyShips()
                     done=true;
                 }
             }
-            if(direction==1 && first<N-length*10)
+            else if(direction==1 && first<N-length*10)
             {
                 bool fieldIsEmpty=true;
                 for(int i=0;i<length;i++)
@@ -232,29 +232,39 @@ bool gameController::isPlaced(int i)
 }
 void gameController::AI()
 {
+    int target;
     bool hasTarget=false;
+    vector <int> targets;
     for(int i=0;i<playerShipStatus.size();i++)
     {
         bool isOne=false;
-        bool isZero=false;
+        bool isThree=false;
         for(int j=2;j<playerShipStatus[i].size();j++)
         {
-            if(playerShipStatus[i][j]==0)
+            if(playerFieldStatus[playerShipStatus[i][j]]==3)
             {
-                isZero=true;
+                isThree=true;
             }
-            if(playerShipStatus[i][j]==1)
+            else if(playerFieldStatus[playerShipStatus[i][j]]==1)
             {
                 isOne=true;
             }
         }
-        if(isZero && isOne)
+        if(isThree && isOne)
         {
-            hasTarget=true;
-            break;
+            for(int j=2;j<playerShipStatus[i].size();j++)
+            {
+                if(playerFieldStatus[playerShipStatus[i][j]]==3)
+                {
+                    targets.push_back(playerShipStatus[i][j]);
+                }
+            }
         }
     }
-    int target;
+    if(targets.size()!=0)
+    {
+        hasTarget=true;
+    }
     bool done=false;
     while(!done)
     {
@@ -268,11 +278,72 @@ void gameController::AI()
         }
         else
         {
-            target=rand()%N;
-            if(hit(target,false))
+            target=targets[rand()%targets.size()];
+            //0 - Left
+            //1 - Right
+            //2 - Up
+            //3 - Down
+            int i=0;
+            while(i!=4)
             {
-                done=true;
+                int direction=rand()%4;
+                if(direction==0 && target%10!=0 && hit(target-1,false))
+                {
+                    done=true;
+                    i=4;
+                }
+                else if(direction==1 && target%10!=9 && hit(target+1,false))
+                {
+                    done=true;
+                    i=4;
+                }
+                else if(direction==2 && target/10!=0 && hit(target-10,false))
+                {
+                    done=true;
+                    i=4;
+                }
+                else if(direction==3 && target/10!=9 && hit(target+10,false))
+                {
+                    done=true;
+                    i=4;
+                }
+                else
+                {
+                    i++;
+                }
             }
         }
     }
+    /*for(int i=0;i<10;i++)
+    {
+        for (int j=0;j<10;j++)
+        {
+            cout<<playerFieldStatus[i*10+j]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;*/
+    for(int i=0;i<playerShipStatus.size();i++)
+    {
+        for(int j=0;j<playerShipStatus[i].size();j++)
+        {
+            cout<<playerShipStatus[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+    for(int i=0;i<enemyShipStatus.size();i++)
+    {
+        for(int j=0;j<enemyShipStatus[i].size();j++)
+        {
+            cout<<enemyShipStatus[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    /*cout<<endl;
+    for(int i=0;i<targets.size();i++)
+    {
+        cout<<targets[i]<<" ";
+    }
+    cout<<endl;*/
 }
