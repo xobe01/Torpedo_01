@@ -24,38 +24,45 @@ gameController::gameController(int N_):N(N_)
     //3 - ship placed, already hit field
 bool gameController::hit(int i,bool isPlayerTurn)
 {
-    if(isPlayerTurn)
+    if(i>N || i<0)
     {
-        if(enemyFieldStatus[i]==0)
-        {
-            enemyFieldStatus[i]=2 ;
-            return true;
-        }
-        else if(enemyFieldStatus[i]==1)
-        {
-            enemyFieldStatus[i]=3;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return false;
     }
     else
     {
-        if(playerFieldStatus[i]==0)
+        if(isPlayerTurn)
         {
-            playerFieldStatus[i]=2 ;
-            return true;
-        }
-        else if(playerFieldStatus[i]==1)
-        {
-            playerFieldStatus[i]=3;
-            return true;
+            if(enemyFieldStatus[i]==0)
+            {
+                enemyFieldStatus[i]=2 ;
+                return true;
+            }
+            else if(enemyFieldStatus[i]==1)
+            {
+                enemyFieldStatus[i]=3;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
-            return false;
+            if(playerFieldStatus[i]==0)
+            {
+                playerFieldStatus[i]=2 ;
+                return true;
+            }
+            else if(playerFieldStatus[i]==1)
+            {
+                playerFieldStatus[i]=3;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
@@ -233,7 +240,6 @@ bool gameController::isPlaced(int i)
 void gameController::AI()
 {
     int target;
-    bool hasTarget=false;
     vector <int> targets;
     for(int i=0;i<playerShipStatus.size();i++)
     {
@@ -261,14 +267,11 @@ void gameController::AI()
             }
         }
     }
-    if(targets.size()!=0)
-    {
-        hasTarget=true;
-    }
     bool done=false;
+    bool randomTarget=false;
     while(!done)
     {
-        if(!hasTarget)
+        if(targets.size()==0)
         {
             target=rand()%N;
             if(hit(target,false))
@@ -276,7 +279,84 @@ void gameController::AI()
                 done=true;
             }
         }
-        else
+        else if(targets.size()==1)
+        {
+            randomTarget=true;
+        }
+        else if(targets.size()>1 && !randomTarget)
+        {
+            int i=0;
+            while(i<targets.size()-1 && !done )
+            {
+                int j=i+1;
+                while(j<targets.size() && !done)
+                {
+                    if(targets[i]-targets[j]==10)
+                    {
+                        cout<<"fel";
+                        if(hit(targets[i]+10,false))
+                        {
+                            cout<<"done01";
+                            done=true;
+                        }
+                        else if(hit(targets[j]-10,false))
+                        {
+                            cout<<"done02";
+                            done=true;
+                        }
+                    }
+                    else if(targets[i]-targets[j]==-10)
+                    {
+                        cout<<"le";
+                        if(hit(targets[i]-10,false))
+                        {
+                            cout<<"done01";
+                            done=true;
+                        }
+                        else if(hit(targets[j]+10,false))
+                        {
+                            cout<<"done02";
+                            done=true;
+                        }
+                    }
+                    else if(targets[i]-targets[j]==1 && targets[i]%10!=0)
+                    {
+                        cout<<"balra";
+                        if(hit(targets[i]+1,false))
+                        {
+                            cout<<"done01";
+                            done=true;
+                        }
+                        else if(hit(targets[j]-1,false))
+                        {
+                            cout<<"done02";
+                            done=true;
+                        }
+                    }
+                    else if(targets[i]-targets[j]==-1 && targets[i]%10!=9)
+                    {
+                        cout<<"jobbra";
+                        if(hit(targets[i]-1,false))
+                        {
+                            cout<<"done01 "<<hit(playerFieldStatus[targets[i]-1],false)<<" "<<playerFieldStatus[targets[i]-1]<<" "<<targets[i]-1<<targets[i];
+                            done=true;
+                        }
+                        else if(hit(targets[j]+1,false))
+                        {
+                            cout<<"done02";
+                            done=true;
+                        }
+                    }
+                    j++;
+                }
+                i++;
+            }
+            if(!done)
+            {
+                randomTarget=true;
+            }
+        }
+        if(randomTarget)
         {
             target=targets[rand()%targets.size()];
             //0 - Left
@@ -314,36 +394,4 @@ void gameController::AI()
             }
         }
     }
-    /*for(int i=0;i<10;i++)
-    {
-        for (int j=0;j<10;j++)
-        {
-            cout<<playerFieldStatus[i*10+j]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;*/
-    for(int i=0;i<playerShipStatus.size();i++)
-    {
-        for(int j=0;j<playerShipStatus[i].size();j++)
-        {
-            cout<<playerShipStatus[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-    cout<<endl;
-    for(int i=0;i<enemyShipStatus.size();i++)
-    {
-        for(int j=0;j<enemyShipStatus[i].size();j++)
-        {
-            cout<<enemyShipStatus[i][j]<<" ";
-        }
-        cout<<endl;
-    }
-    /*cout<<endl;
-    for(int i=0;i<targets.size();i++)
-    {
-        cout<<targets[i]<<" ";
-    }
-    cout<<endl;*/
 }
