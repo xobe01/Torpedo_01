@@ -6,7 +6,6 @@
 #include "ship.hpp"
 #include <cmath>
 #include "staticText.hpp"
-#include <time.h>
 #include "background.hpp"
 
 using namespace genv;
@@ -94,6 +93,8 @@ public:
         int whichShip=0;
         bool playersTurn=true;
         bool endGame=false;
+        bool isChanged=true;
+        bool needNewTimer=true;
         int kesleltet;
         gin.timer(40);
         while(gin >> ev && ev.keycode!=key_escape)
@@ -156,6 +157,7 @@ public:
             {
                 if(!endGame)
                 {
+                    isChanged=false;
                     if(playersTurn)
                     {
                         if(ev.button==btn_left)
@@ -164,6 +166,7 @@ public:
                             {
                                 if(enemyFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->isGoodTarget(i,true))
                                 {
+                                    isChanged=true;
                                     if(!controller->hit(i,true))
                                     {
                                         playersTurn=false;
@@ -174,11 +177,19 @@ public:
                     }
                     else
                     {
-                        kesleltet=time(NULL);
-                        while(time(NULL)-kesleltet<1){}
-                        if(!controller->hit(controller->AI(),false))
+                        if(needNewTimer && ev.type==ev_timer)
                         {
-                            playersTurn=true;
+                            kesleltet=ev.time;
+                            needNewTimer=false;
+                        }
+                        if(ev.time-kesleltet>1000 && !needNewTimer)
+                        {
+                            isChanged=true;
+                            needNewTimer=true;
+                            if(!controller->hit(controller->AI(),false))
+                            {
+                                playersTurn=true;
+                            }
                         }
                     }
                     int playerScore=0;
@@ -215,64 +226,67 @@ public:
                     }
                 }
             }
-            for(int i=0;i<enemyFields.size();i++)
+            if(isChanged)
             {
-                enemyFields[i]->draw();
-            }
-            for(int i=0;i<enemyShips.size();i++)
-            {
-                if(controller->whichSank(i,false) || endGame)
+                for(int i=0;i<enemyFields.size();i++)
                 {
-                    enemyShips[i]->draw();
+                    enemyFields[i]->draw();
                 }
-            }
-            for(int i=0;i<enemyFields.size();i++)
-            {
-                enemyFields[i]->drawAction(controller->getEnemyValue()[i]);
-            }
-            for(int i=0;i<playerFields.size();i++)
-            {
-                playerFields[i]->draw();
-            }
-            for(int i=0;i<staticShips.size();i++)
-            {
-                if(!controller->isPlaced(i))
+                for(int i=0;i<enemyShips.size();i++)
                 {
-                    staticShips[i]->draw();
+                    if(controller->whichSank(i,false) || endGame)
+                    {
+                        enemyShips[i]->draw();
+                    }
                 }
-            }
-            for(int i=0;i<playerShips.size();i++)
-            {
-                playerShips[i]->draw();
-            }
-            for(int i=0;i<playerFields.size();i++)
-            {
-                playerFields[i]->drawAction(controller->getPlayerValue()[i]);
-            }
-            if(canPlace)
-            {
+                for(int i=0;i<enemyFields.size();i++)
+                {
+                    enemyFields[i]->drawAction(controller->getEnemyValue()[i]);
+                }
                 for(int i=0;i<playerFields.size();i++)
                 {
-                    int xMouse;
-                    int yMouse;
-                    if(ev.type==ev_mouse)
+                    playerFields[i]->draw();
+                }
+                for(int i=0;i<staticShips.size();i++)
+                {
+                    if(!controller->isPlaced(i))
                     {
-                        xMouse=ev.pos_x;
-                        yMouse=ev.pos_y;
-                    }
-                    if(playerFields[i]->isSelected(xMouse,yMouse) && controller->placingPlayerShips(0,i,direction,length,false))
-                    {
-                        ship* visual=new ship(playerFields[i]->getX(),playerFields[i]->getY(),side,shipFrame,length,direction);
-                        visual->draw();
-                        delete visual;
+                        staticShips[i]->draw();
                     }
                 }
+                for(int i=0;i<playerShips.size();i++)
+                {
+                    playerShips[i]->draw();
+                }
+                for(int i=0;i<playerFields.size();i++)
+                {
+                    playerFields[i]->drawAction(controller->getPlayerValue()[i]);
+                }
+                if(canPlace)
+                {
+                    for(int i=0;i<playerFields.size();i++)
+                    {
+                        int xMouse;
+                        int yMouse;
+                        if(ev.type==ev_mouse)
+                        {
+                            xMouse=ev.pos_x;
+                            yMouse=ev.pos_y;
+                        }
+                        if(playerFields[i]->isSelected(xMouse,yMouse) && controller->placingPlayerShips(0,i,direction,length,false))
+                        {
+                            ship* visual=new ship(playerFields[i]->getX(),playerFields[i]->getY(),side,shipFrame,length,direction);
+                            visual->draw();
+                            delete visual;
+                        }
+                    }
+                }
+                for(int i=0;i<staticTexts.size();i++)
+                {
+                    staticTexts[i]->draw();
+                }
+                gout<<refresh;
             }
-            for(int i=0;i<staticTexts.size();i++)
-            {
-                staticTexts[i]->draw();
-            }
-            gout<<refresh;
         }
     }
 };
