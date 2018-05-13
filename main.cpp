@@ -107,18 +107,6 @@ public:
                 }
                 else if(ev.button==btn_left)
                 {
-                    for(int i=0; i<playerShips.size();i++)
-                    {
-                        if(playerShips[i]->isSelected(ev.pos_x,ev.pos_y) && !canPlace)
-                        {
-                            length=playerShips[i]->getLength();
-                            canPlace=true;
-                            whichShip=i;
-                            number--;
-                            playerShips[i]=playerShips[playerShips.size()-1];
-                            playerShips.pop_back();
-                        }
-                    }
                     for(int i=0;i<staticShips.size();i++)
                     {
                         if(staticShips[i]->isSelected(ev.pos_x,ev.pos_y) && !controller->isPlaced(i))
