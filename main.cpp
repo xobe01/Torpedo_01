@@ -7,6 +7,7 @@
 #include <cmath>
 #include "staticText.hpp"
 #include <time.h>
+#include "background.hpp"
 
 using namespace genv;
 using namespace std;
@@ -17,6 +18,7 @@ const int YY=600;
 class myWindow : public window
 {
 protected:
+    background* bGround=new background(0,0,950,600,0,0,0);
     gameController* controller=new gameController();
     int side;
     int shipFrame;
@@ -75,10 +77,6 @@ public:
         staticText *text_03=new staticText(500,115,0,0,"3. Place the ship: left click on your board");
         staticTexts.push_back(text_03);
     }
-    void background()
-    {
-        gout<<move_to(0,0)<<color(0,0,0)<<box(XX,YY);
-    }
     void event_loop()
     {
         controller->placingEnemyShips();
@@ -100,7 +98,7 @@ public:
         gin.timer(40);
         while(gin >> ev && ev.keycode!=key_escape)
         {
-            background();
+            bGround->draw();
             if(!startGame)
             {
                 if(ev.button==btn_right)
