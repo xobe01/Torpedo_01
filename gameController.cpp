@@ -5,8 +5,10 @@
 
 using namespace std;
 
-gameController::gameController(int N_):N(N_)
+gameController::gameController()
 {
+    N=100;
+    inRow=10;
     vector <vector<int>>ships(5);
     vector<int>fields(N,0);
     vector<bool>place(5,false);
@@ -109,7 +111,7 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
 {
     //direction 0 - horizontal
     //direction 1 - vertical
-    if(direction==0 && (first+length-1)%10>=length-1)
+    if(direction==0 && (first+length-1)%inRow>=length-1)
     {
         bool fieldIsEmpty=true;
         for(int i=0;i<length;i++)
@@ -138,12 +140,12 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
             return false;
         }
     }
-    else if(direction==1 && first<N-(length-1)*10)
+    else if(direction==1 && first<N-(length-1)*inRow)
     {
         bool fieldIsEmpty=true;
         for(int i=0;i<length;i++)
         {
-            if(playerFieldStatus[first+i*10]!=0)
+            if(playerFieldStatus[first+i*inRow]!=0)
             {
                 fieldIsEmpty=false;
             }
@@ -156,8 +158,8 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
             playerShipStatus[shipNumber].push_back(direction);
             for(int i=0;i<length;i++)
             {
-                playerFieldStatus[first+i*10]=1;
-                playerShipStatus[shipNumber].push_back(first+i*10);
+                playerFieldStatus[first+i*inRow]=1;
+                playerShipStatus[shipNumber].push_back(first+i*inRow);
             }
             }
             return true;
@@ -175,7 +177,7 @@ bool gameController::placingPlayerShips(int shipNumber,int first, int direction,
 void gameController::placingEnemyShips()
 {
     srand(time(NULL));
-    for(int j=0;j<5;j++)
+    for(int j=0;j<enemyShipStatus.size();j++)
     {
         int length=j+2;
         if(j>1)
@@ -189,7 +191,7 @@ void gameController::placingEnemyShips()
             int direction=rand()%2;
             //direction 0 - horizontal
             //direction 1 - vertical
-            if(direction==0 && (first+length-1)%10>=length-1)
+            if(direction==0 && (first+length-1)%inRow>=length-1)
             {
                 bool fieldIsEmpty=true;
                 for(int i=0;i<length;i++)
@@ -211,12 +213,12 @@ void gameController::placingEnemyShips()
                     done=true;
                 }
             }
-            else if(direction==1 && first<N-(length-1)*10)
+            else if(direction==1 && first<N-(length-1)*inRow)
             {
                 bool fieldIsEmpty=true;
                 for(int i=0;i<length;i++)
                 {
-                    if(enemyFieldStatus[first+i*10]!=0)
+                    if(enemyFieldStatus[first+i*inRow]!=0)
                     {
                         fieldIsEmpty=false;
                     }
@@ -227,8 +229,8 @@ void gameController::placingEnemyShips()
                     enemyShipStatus[j].push_back(direction);
                     for(int i=0;i<length;i++)
                     {
-                        enemyFieldStatus[first+i*10]=1;
-                        enemyShipStatus[j].push_back(first+i*10);
+                        enemyFieldStatus[first+i*inRow]=1;
+                        enemyShipStatus[j].push_back(first+i*inRow);
                     }
                     done=true;
                 }
@@ -280,7 +282,9 @@ bool gameController::isPlaced(int i)
 }
 int gameController::AI()
 {
-    int shortestShip=6;
+    int iCounter=0;
+    int jCounter=0;
+    int shortestShip=playerShipStatus[0][0];
     for(int i=0;i<playerShipStatus.size();i++)
     {
         if(!whichSank(i,true) && playerShipStatus[i][0]<shortestShip)
@@ -336,47 +340,54 @@ int gameController::AI()
         }
         else if(targets.size()>1 && !randomTarget)
         {
-            int i=0;
-            while(i<targets.size() && !checkArea )
+            bool found=false;
+            while(iCounter<targets.size() && !checkArea && !found)
             {
-                int j=0;
-                while(j<targets.size() && !checkArea)
+                while(jCounter<targets.size() && !checkArea && !found)
                 {
-                    if(targets[i]-targets[j]==10 && targets[i]/10>1)
+                    if(targets[iCounter]-targets[jCounter]==inRow && targets[iCounter]/inRow>1)
                     {
-                            if(isGoodTarget(targets[j]-10,false))
+                            if(isGoodTarget(targets[jCounter]-inRow,false))
                         {
-                            target=targets[j]-10;
+                            target=targets[jCounter]-inRow;
                             checkArea=true;
+                            found=true;
                         }
                     }
-                    else if(targets[i]-targets[j]==-10 && targets[i]/10<8)
+                    else if(targets[iCounter]-targets[jCounter]==-inRow && targets[iCounter]/inRow<inRow-2)
                     {
-                        if(isGoodTarget(targets[j]+10,false))
+                        if(isGoodTarget(targets[jCounter]+inRow,false))
                         {
-                            target=targets[j]+10;
+                            target=targets[jCounter]+inRow;
                             checkArea=true;
+                            found=true;
                         }
                     }
-                    else if(targets[i]-targets[j]==1 && targets[i]%10>1)
+                    else if(targets[iCounter]-targets[jCounter]==1 && targets[iCounter]%inRow>1)
                     {
-                            if(isGoodTarget(targets[j]-1,false))
+                            if(isGoodTarget(targets[jCounter]-1,false))
                         {
-                            target=targets[j]-1;
+                            target=targets[jCounter]-1;
                             checkArea=true;
+                            found=true;
                         }
                     }
-                    else if(targets[i]-targets[j]==-1 && targets[i]%10<8)
+                    else if(targets[iCounter]-targets[jCounter]==-1 && targets[iCounter]%inRow<inRow-2)
                     {
-                        if(isGoodTarget(targets[j]+1,false))
+                        if(isGoodTarget(targets[jCounter]+1,false))
                         {
-                            target=targets[j]+1;
+                            target=targets[jCounter]+1;
                             checkArea=true;
+                            found=true;
                         }
                     }
-                    j++;
+                    jCounter++;
                 }
-                i++;
+                if(!found)
+                {
+                    jCounter=0;
+                    iCounter++;
+                }
             }
             if(!checkArea)
             {
@@ -386,24 +397,29 @@ int gameController::AI()
         if(randomTarget)
         {
             target=targets[rand()%targets.size()];
-            if(target%10!=0 && isGoodTarget(target-1,false))
+            int direction =rand()%4;
+            //0 - Left
+            //1 - Right
+            //2 - Up
+            //3 - Down
+            if(direction==0 && target%inRow!=0 && isGoodTarget(target-1,false))
             {
-                    target--;
+                target--;
                 checkArea=true;
             }
-            else if(target%10!=9 && isGoodTarget(target+1,false))
+            else if(direction==1 && target%inRow!=inRow-1 && isGoodTarget(target+1,false))
             {
                 target++;
                 checkArea=true;
             }
-            else if(target/10!=0 && isGoodTarget(target-10,false))
+            else if(direction==2 && target/inRow!=0 && isGoodTarget(target-inRow,false))
             {
-                target-=10;
+                target-=inRow;
                 checkArea=true;
             }
-            else if(target/10!=9 && isGoodTarget(target+10,false))
+            else if(direction==3 && target/inRow!=inRow-1 && isGoodTarget(target+inRow,false))
                 {
-                target+=10;
+                target+=inRow;
                 checkArea=true;
             }
         }
@@ -422,7 +438,7 @@ int gameController::AI()
                         isTarget=true;
                     }
                 }
-                if((isGoodTarget(target+i,false) || isTarget) && (target+i)%10!=0)
+                if((isGoodTarget(target+i,false) || isTarget) && (target+i)%inRow!=0)
                 {
                     counter++;
                     i++;
@@ -444,7 +460,7 @@ int gameController::AI()
                         isTarget=true;
                     }
                 }
-                if((isGoodTarget(target-i,false) || isTarget) && (target-i)%10!=9)
+                if((isGoodTarget(target-i,false) || isTarget) && (target-i)%inRow!=inRow-1)
                 {
                     counter++;
                     i++;
@@ -468,12 +484,12 @@ int gameController::AI()
                     bool isTarget=false;
                     for(int j=0;j<targets.size();j++)
                     {
-                        if(targets[j]==target+i*10)
+                        if(targets[j]==target+i*inRow)
                         {
                             isTarget=true;
                         }
                     }
-                    if((isGoodTarget(target+i*10,false) || isTarget) && (target+i*10)/10<=9)
+                    if((isGoodTarget(target+i*inRow,false) || isTarget) && (target+i*inRow)/inRow<=inRow-1)
                     {
                         counter++;
                         i++;
@@ -490,12 +506,12 @@ int gameController::AI()
                     bool isTarget=false;
                     for(int j=0;j<targets.size();j++)
                     {
-                        if(targets[j]==target-i*10)
+                        if(targets[j]==target-i*inRow)
                         {
                             isTarget=true;
                         }
                     }
-                    if((isGoodTarget(target-i*10,false) || playerFieldStatus[target-i*10]==3) && (target-i*10)/10>=0)
+                    if((isGoodTarget(target-i*inRow,false) || playerFieldStatus[target-i*inRow]==3) && (target-i*inRow)/inRow>=0)
                     {
                         counter++;
                         i++;

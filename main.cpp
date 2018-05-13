@@ -14,43 +14,52 @@ using namespace std;
 const int XX=950;
 const int YY=600;
 
-void background()
-{
-    gout<<move_to(0,0)<<color(0,0,0)<<box(XX,YY);
-}
-
 class myWindow : public window
 {
 protected:
-    gameController* controller=new gameController(100);
+    gameController* controller=new gameController();
+    int side;
+    int shipFrame;
+    int fieldFrame;
+    int playerBoardStartX;
+    int enemyBoardStartX;
+    int boardY;
+    int inRow;
 public:
     myWindow()
     {
-        for(int i=0;i<10;i++)
+        side=40;
+        shipFrame=5;
+        fieldFrame=2;
+        playerBoardStartX=50;
+        enemyBoardStartX=500;
+        boardY=150;
+        inRow=10;
+        for(int i=0;i<inRow;i++)
         {
-            for(int j=0;j<10;j++)
+            for(int j=0;j<inRow;j++)
             {
-                field* f = new field(50+j*40,150+i*40,40,2);
+                field* f = new field(playerBoardStartX+j*side,boardY+i*side,side,fieldFrame);
                 playerFields.push_back(f);
             }
         }
-        for(int i=0;i<10;i++)
+        for(int i=0;i<inRow;i++)
         {
-            for(int j=0;j<10;j++)
+            for(int j=0;j<inRow;j++)
             {
-                field* f = new field(500+j*40,150+i*40,40,2);
+                field* f = new field(enemyBoardStartX+j*side,boardY+i*side,side,fieldFrame);
                 enemyFields.push_back(f);
             }
         }
-        ship* staticShip_01 = new ship(50,100,40,5,3,0);
+        ship* staticShip_01 = new ship(50,100,side,shipFrame,3,0);
         staticShips.push_back(staticShip_01);
-        ship* staticShip_02 = new ship(210,100,40,5,3,0);
+        ship* staticShip_02 = new ship(210,100,side,shipFrame,3,0);
         staticShips.push_back(staticShip_02);
-        ship* staticShip_03 = new ship(370,100,40,5,2,0);
+        ship* staticShip_03 = new ship(370,100,side,shipFrame,2,0);
         staticShips.push_back(staticShip_03);
-        ship* staticShip_04 = new ship(50,50,40,5,4,0);
+        ship* staticShip_04 = new ship(50,50,side,shipFrame,4,0);
         staticShips.push_back(staticShip_04);
-        ship* staticShip_05 = new ship(250,50,40,5,5,0);
+        ship* staticShip_05 = new ship(250,50,side,shipFrame,5,0);
         staticShips.push_back(staticShip_05);
 
         staticText *text_esc=new staticText(20,20,0,0,"Press 'Esc' to exit");
@@ -66,12 +75,16 @@ public:
         staticText *text_03=new staticText(500,115,0,0,"3. Place the ship: left click on your board");
         staticTexts.push_back(text_03);
     }
+    void background()
+    {
+        gout<<move_to(0,0)<<color(0,0,0)<<box(XX,YY);
+    }
     void event_loop()
     {
         controller->placingEnemyShips();
         for(int i=0;i<controller->getShipNumber().size();i++)
         {
-            ship* enemyShip = new ship(500+controller->getShipNumber()[i][2]%10*40,150+controller->getShipNumber()[i][2]/10*40,40,5,controller->getShipNumber()[i][0],controller->getShipNumber()[i][1]);
+            ship* enemyShip = new ship(enemyBoardStartX+controller->getShipNumber()[i][2]%inRow*side,boardY+controller->getShipNumber()[i][2]/inRow*side,side,shipFrame,controller->getShipNumber()[i][0],controller->getShipNumber()[i][1]);
             enemyShips.push_back(enemyShip);
         }
         event ev;
@@ -84,6 +97,7 @@ public:
         bool playersTurn=true;
         bool endGame=false;
         int kesleltet;
+        gin.timer(40);
         while(gin >> ev && ev.keycode!=key_escape)
         {
             background();
@@ -93,7 +107,7 @@ public:
                 {
                     direction=abs(direction-1);
                 }
-                if(ev.button==btn_left)
+                else if(ev.button==btn_left)
                 {
                     for(int i=0; i<playerShips.size();i++)
                     {
@@ -125,7 +139,7 @@ public:
                     {
                         if(playerFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->placingPlayerShips(whichShip,i,direction,length,true) && canPlace)
                         {
-                            ship *playerShip=new ship(50+i%10*40,150+i/10*40,40,5,length,direction);
+                            ship *playerShip=new ship(playerBoardStartX+i%inRow*side,boardY+i/inRow*side,side,shipFrame,length,direction);
                             playerShips.push_back(playerShip);
                             number++;
                             direction=0;
@@ -139,7 +153,7 @@ public:
                 {
                     playerShips[i]->draw();
                 }
-                if(number==5)
+                if(number==controller->getShipNumber().size())
                 {
                     for(int i=0;i<3;i++)
                     {
@@ -253,9 +267,16 @@ public:
             {
                 for(int i=0;i<playerFields.size();i++)
                 {
-                    if(playerFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->placingPlayerShips(0,i,direction,length,false))
+                    int xMouse;
+                    int yMouse;
+                    if(ev.type==ev_mouse)
                     {
-                        ship* visual=new ship(playerFields[i]->getX(),playerFields[i]->getY(),40,5,length,direction);
+                        xMouse=ev.pos_x;
+                        yMouse=ev.pos_y;
+                    }
+                    if(playerFields[i]->isSelected(xMouse,yMouse) && controller->placingPlayerShips(0,i,direction,length,false))
+                    {
+                        ship* visual=new ship(playerFields[i]->getX(),playerFields[i]->getY(),side,shipFrame,length,direction);
                         visual->draw();
                         delete visual;
                     }

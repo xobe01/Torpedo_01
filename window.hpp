@@ -14,8 +14,6 @@ protected:
     vector <widget*> enemyShips;
     vector <widget*> staticShips;
     vector <widget*> staticTexts;
-public:
-    window();
 };
 
 #endif // WINDOW_HPP_INCLUDED

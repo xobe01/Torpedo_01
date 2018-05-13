@@ -12,9 +12,10 @@ protected:
     vector <vector<int>> enemyShipStatus;
     vector <vector<int>> playerShipStatus;
     vector <bool> placed;
+    int inRow;
     int N;
 public:
-    gameController(int N_);
+    gameController();
     virtual bool hit(int i,bool isPlayerTurn);
     virtual bool isGoodTarget(int i, bool isPlayerTurn);
     virtual vector<int> getEnemyValue();

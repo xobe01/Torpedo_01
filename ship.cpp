@@ -56,15 +56,6 @@ void ship::dontBeSelected()
 {
     selected=false;
 }
-int ship::getX()
-{
-
-}
-int ship::getY()
-{
-
-}
-void ship::drawAction(int enemyValue)
-{
-
-}
+int ship::getX(){}
+int ship::getY(){}
+void ship::drawAction(int enemyValue){}

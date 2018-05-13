@@ -26,8 +26,8 @@ void field::drawAction(int enemyValue)
         float xCenter=x+side/2;
         float yCenter=y+side/2;
         float R = side/2-5;
-        float r = side/2-10;
-        float r_2=side/2-15;
+        float r = side/2-9;
+        float r_2=side/2-14;
         for(int i=0;i<side;i++)
         {
             for(int j=0;j<side;j++)
@@ -41,21 +41,10 @@ void field::drawAction(int enemyValue)
         }
     }
 }
-int field::getLength()
-{
 
-}
 bool field::isSelected(int xMouse,int yMouse)
 {
     return xMouse>x && xMouse<x+side && yMouse>y && yMouse<y+side;
-}
-void field::beSelected()
-{
-
-}
-void field::dontBeSelected()
-{
-
 }
 int field::getX()
 {
@@ -65,3 +54,6 @@ int field::getY()
 {
     return y;
 }
+int field::getLength(){}
+void field::beSelected(){}
+void field::dontBeSelected(){}
