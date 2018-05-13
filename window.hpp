@@ -13,6 +13,7 @@ protected:
     vector <widget*> playerShips;
     vector <widget*> enemyShips;
     vector <widget*> staticShips;
+    vector <widget*> staticTexts;
 public:
     window();
 };

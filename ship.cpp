@@ -33,9 +33,6 @@ void ship::draw()
         gout<<move_to(x+1,y+1)<<color(R,G,B)<<box(side-2,side*length-2)<<move_to(x+frame,y+frame)<<color(200,200,200)<<box(side-2*frame,side*length-2*frame);
     }
 }
-void ship::action(event ev)
-{
-}
 int ship::getLength()
 {
     return length;

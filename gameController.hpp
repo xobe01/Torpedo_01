@@ -15,7 +15,7 @@ protected:
     int N;
 public:
     gameController(int N_);
-    virtual void hit(int i,bool isPlayerTurn);
+    virtual bool hit(int i,bool isPlayerTurn);
     virtual bool isGoodTarget(int i, bool isPlayerTurn);
     virtual vector<int> getEnemyValue();
     virtual vector<int> getPlayerValue();
@@ -25,7 +25,7 @@ public:
     virtual vector<vector<int>> getShipNumber();
     virtual void place(int i);
     virtual bool isPlaced(int i);
-    virtual void AI();
+    virtual int AI();
 };
 
 #endif // GAMECONTROLLER_HPP_INCLUDED

@@ -11,7 +11,6 @@ public:
     virtual bool isSelected(int xMouse, int yMouse)=0;
     virtual void draw()=0;
     virtual void drawAction(int enemyValue)=0;
-    virtual void action(genv::event ev)=0;
     virtual int getLength()=0;
     virtual void beSelected()=0;
     virtual void dontBeSelected()=0;

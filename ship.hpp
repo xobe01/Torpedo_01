@@ -11,9 +11,8 @@ protected:
 public:
     ship(int x_,int y_, int side_,int frame_,int length_,int direction_);
     virtual void draw();
-    virtual void drawAction(int enemyValue);
-    virtual void action(genv::event ev);
     virtual int getLength();
+    virtual void drawAction(int enemyValue);
     virtual bool isSelected(int xMouse,int yMouse);
     virtual void beSelected();
     virtual void dontBeSelected();

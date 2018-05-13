@@ -4,8 +4,9 @@
 #include "gameController.hpp"
 #include <vector>
 #include "ship.hpp"
-#include <iostream>
 #include <cmath>
+#include "staticText.hpp"
+#include <time.h>
 
 using namespace genv;
 using namespace std;
@@ -51,6 +52,19 @@ public:
         staticShips.push_back(staticShip_04);
         ship* staticShip_05 = new ship(250,50,40,5,5,0);
         staticShips.push_back(staticShip_05);
+
+        staticText *text_esc=new staticText(20,20,0,0,"Press 'Esc' to exit");
+        staticTexts.push_back(text_esc);
+        staticText *text_your=new staticText(210,580,0,0,"Your board");
+        staticTexts.push_back(text_your);
+        staticText *text_enemys=new staticText(640,580,0,0,"Enemy's board");
+        staticTexts.push_back(text_enemys);
+        staticText *text_01=new staticText(500,35,0,0,"1. Select a ship: left click on the ship");
+        staticTexts.push_back(text_01);
+        staticText *text_02=new staticText(500,75,0,0,"2. Rotate the ship: right click");
+        staticTexts.push_back(text_02);
+        staticText *text_03=new staticText(500,115,0,0,"3. Place the ship: left click on your board");
+        staticTexts.push_back(text_03);
     }
     void event_loop()
     {
@@ -69,6 +83,7 @@ public:
         int whichShip=0;
         bool playersTurn=true;
         bool endGame=false;
+        int kesleltet;
         while(gin >> ev && ev.keycode!=key_escape)
         {
             background();
@@ -126,6 +141,14 @@ public:
                 }
                 if(number==5)
                 {
+                    for(int i=0;i<3;i++)
+                    {
+                        staticTexts.pop_back();
+                    }
+                    staticText *text_01=new staticText(500,35,0,0,"1. Shoot: left click on the enemy's board");
+                    staticTexts.push_back(text_01);
+                    staticText *text_02=new staticText(500,75,0,0,"2. If your shot hits it's your turn again");
+                    staticTexts.push_back(text_02);
                     startGame=true;
                 }
             }
@@ -141,16 +164,22 @@ public:
                             {
                                 if(enemyFields[i]->isSelected(ev.pos_x,ev.pos_y) && controller->isGoodTarget(i,true))
                                 {
-                                    controller->hit(i,true);
-                                    playersTurn=false;
+                                    if(!controller->hit(i,true))
+                                    {
+                                        playersTurn=false;
+                                    }
                                 }
                             }
                         }
                     }
                     else
                     {
-                        controller->AI();
-                        playersTurn=true;
+                        kesleltet=time(NULL);
+                        while(time(NULL)-kesleltet<1){}
+                        if(!controller->hit(controller->AI(),false))
+                        {
+                            playersTurn=true;
+                        }
                     }
                     int playerScore=0;
                     for(int i=0;i<enemyShips.size();i++)
@@ -171,10 +200,18 @@ public:
                     if(playerScore==enemyShips.size())
                     {
                         endGame=true;
+                        staticTexts.pop_back();
+                        staticTexts.pop_back();
+                        staticText *text_02=new staticText(425,75,0,0,"YOU WIN!");
+                        staticTexts.push_back(text_02);
                     }
                     else if(enemyScore==playerShips.size())
                     {
                         endGame=true;
+                        staticTexts.pop_back();
+                        staticTexts.pop_back();
+                        staticText *text_02=new staticText(425,75,0,0,"YOU LOSE :(");
+                        staticTexts.push_back(text_02);
                     }
                 }
             }
@@ -184,7 +221,7 @@ public:
             }
             for(int i=0;i<enemyShips.size();i++)
             {
-                if(controller->whichSank(i,false))
+                if(controller->whichSank(i,false) || endGame)
                 {
                     enemyShips[i]->draw();
                 }
@@ -223,6 +260,10 @@ public:
                         delete visual;
                     }
                 }
+            }
+            for(int i=0;i<staticTexts.size();i++)
+            {
+                staticTexts[i]->draw();
             }
             gout<<refresh;
         }

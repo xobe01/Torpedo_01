@@ -1,9 +1,7 @@
 #include "gameController.hpp"
 #include <vector>
-#include <cstdlib>
 #include <time.h>
 #include <stdlib.h>
-#include <iostream>
 
 using namespace std;
 
@@ -20,19 +18,25 @@ gameController::gameController(int N_):N(N_)
 }
     //0 - empty, untouched field
     //1 - ship placed, untouched field
-    //2 - empty, already hit field
+    //2 - empty, already field
     //3 - ship placed, already hit field
-void gameController::hit(int i,bool isPlayerTurn)
+bool gameController::hit(int i,bool isPlayerTurn)
 {
     if(isPlayerTurn)
     {
         if(enemyFieldStatus[i]==0)
         {
             enemyFieldStatus[i]=2;
+            return false;
         }
         else if(enemyFieldStatus[i]==1)
         {
             enemyFieldStatus[i]=3;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
     else
@@ -40,10 +44,16 @@ void gameController::hit(int i,bool isPlayerTurn)
         if(playerFieldStatus[i]==0)
         {
             playerFieldStatus[i]=2;
+            return false;
         }
         else if(playerFieldStatus[i]==1)
         {
             playerFieldStatus[i]=3;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 }
@@ -268,8 +278,16 @@ bool gameController::isPlaced(int i)
 {
     return placed[i];
 }
-void gameController::AI()
+int gameController::AI()
 {
+    int shortestShip=6;
+    for(int i=0;i<playerShipStatus.size();i++)
+    {
+        if(!whichSank(i,true) && playerShipStatus[i][0]<shortestShip)
+        {
+            shortestShip=playerShipStatus[i][0];
+        }
+    }
     int target;
     vector <int> targets;
     for(int i=0;i<playerShipStatus.size();i++)
@@ -299,16 +317,17 @@ void gameController::AI()
         }
     }
     bool done=false;
+    bool checkArea;
     bool randomTarget=false;
     while(!done)
     {
+        checkArea=false;
         if(targets.size()==0)
         {
             target=rand()%N;
             if(isGoodTarget(target,false))
             {
-                hit(target,false);
-                done=true;
+                checkArea=true;
             }
         }
         else if(targets.size()==1)
@@ -318,48 +337,48 @@ void gameController::AI()
         else if(targets.size()>1 && !randomTarget)
         {
             int i=0;
-            while(i<targets.size() && !done )
+            while(i<targets.size() && !checkArea )
             {
                 int j=0;
-                while(j<targets.size() && !done)
+                while(j<targets.size() && !checkArea)
                 {
                     if(targets[i]-targets[j]==10 && targets[i]/10>1)
                     {
-                         if(isGoodTarget(targets[j]-10,false))
+                            if(isGoodTarget(targets[j]-10,false))
                         {
-                            hit(targets[j]-10,false);
-                            done=true;
+                            target=targets[j]-10;
+                            checkArea=true;
                         }
                     }
                     else if(targets[i]-targets[j]==-10 && targets[i]/10<8)
                     {
                         if(isGoodTarget(targets[j]+10,false))
                         {
-                            hit(targets[j]+10,false);
-                            done=true;
+                            target=targets[j]+10;
+                            checkArea=true;
                         }
                     }
                     else if(targets[i]-targets[j]==1 && targets[i]%10>1)
                     {
-                         if(isGoodTarget(targets[j]-1,false))
+                            if(isGoodTarget(targets[j]-1,false))
                         {
-                            hit(targets[j]-1,false);
-                            done=true;
+                            target=targets[j]-1;
+                            checkArea=true;
                         }
                     }
                     else if(targets[i]-targets[j]==-1 && targets[i]%10<8)
                     {
                         if(isGoodTarget(targets[j]+1,false))
                         {
-                            hit(targets[j]+1,false);
-                            done=true;
+                            target=targets[j]+1;
+                            checkArea=true;
                         }
                     }
                     j++;
                 }
                 i++;
             }
-            if(!done)
+            if(!checkArea)
             {
                 randomTarget=true;
             }
@@ -367,43 +386,131 @@ void gameController::AI()
         if(randomTarget)
         {
             target=targets[rand()%targets.size()];
-            //0 - Left
-            //1 - Right
-            //2 - Up
-            //3 - Down
-            int i=0;
-            while(i!=4)
+            if(target%10!=0 && isGoodTarget(target-1,false))
             {
-                int direction=rand()%4;
-                if(direction==0 && target%10!=0 && isGoodTarget(target-1,false))
+                    target--;
+                checkArea=true;
+            }
+            else if(target%10!=9 && isGoodTarget(target+1,false))
+            {
+                target++;
+                checkArea=true;
+            }
+            else if(target/10!=0 && isGoodTarget(target-10,false))
+            {
+                target-=10;
+                checkArea=true;
+            }
+            else if(target/10!=9 && isGoodTarget(target+10,false))
                 {
-                    hit(target-1,false);
-                    done=true;
-                    i=4;
+                target+=10;
+                checkArea=true;
+            }
+        }
+        if(checkArea)
+        {
+            int counter=1;
+            int i=1;
+            bool isGoodField=true;
+            while(isGoodField)
+            {
+                bool isTarget=false;
+                for(int j=0;j<targets.size();j++)
+                {
+                    if(targets[j]==target+i)
+                    {
+                        isTarget=true;
+                    }
                 }
-                else if(direction==1 && target%10!=9 && isGoodTarget(target+1,false))
+                if((isGoodTarget(target+i,false) || isTarget) && (target+i)%10!=0)
                 {
-                    hit(target+1,false);
-                    done=true;
-                    i=4;
-                }
-                else if(direction==2 && target/10!=0 && isGoodTarget(target-10,false))
-                {
-                    hit(target-10,false);
-                    done=true;
-                    i=4;
-                }
-                else if(direction==3 && target/10!=9 && isGoodTarget(target+10,false))
-                {
-                    hit(target+10,false);
-                    done=true;
-                    i=4;
+                    counter++;
+                    i++;
                 }
                 else
                 {
+                    isGoodField=false;
+                }
+            }
+            i=1;
+            isGoodField=true;
+            while(isGoodField)
+            {
+                bool isTarget=false;
+                for(int j=0;j<targets.size();j++)
+                {
+                    if(targets[j]==target-i)
+                    {
+                        isTarget=true;
+                    }
+                }
+                if((isGoodTarget(target-i,false) || isTarget) && (target-i)%10!=9)
+                {
+                    counter++;
                     i++;
+                }
+                else
+                {
+                    isGoodField=false;
+                }
+            }
+            if(counter>=shortestShip)
+            {
+                done=true;
+            }
+            else
+            {
+                counter=1;
+                i=1;
+                isGoodField=true;
+                while(isGoodField)
+                {
+                    bool isTarget=false;
+                    for(int j=0;j<targets.size();j++)
+                    {
+                        if(targets[j]==target+i*10)
+                        {
+                            isTarget=true;
+                        }
+                    }
+                    if((isGoodTarget(target+i*10,false) || isTarget) && (target+i*10)/10<=9)
+                    {
+                        counter++;
+                        i++;
+                    }
+                    else
+                    {
+                        isGoodField=false;
+                    }
+                }
+                i=1;
+                isGoodField=true;
+                while(isGoodField)
+                {
+                    bool isTarget=false;
+                    for(int j=0;j<targets.size();j++)
+                    {
+                        if(targets[j]==target-i*10)
+                        {
+                            isTarget=true;
+                        }
+                    }
+                    if((isGoodTarget(target-i*10,false) || playerFieldStatus[target-i*10]==3) && (target-i*10)/10>=0)
+                    {
+                        counter++;
+                        i++;
+                    }
+                    else
+                    {
+                        isGoodField=false;
+                    }
+                }
+                if(counter>=shortestShip)
+                {
+                    done=true;
                 }
             }
         }
     }
+    return target;
 }

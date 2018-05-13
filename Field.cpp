@@ -1,5 +1,4 @@
 #include "field.hpp"
-#include "button.hpp"
 #include "graphics.hpp"
 #include "widget.hpp"
 #include <cmath>
@@ -41,9 +40,6 @@ void field::drawAction(int enemyValue)
             }
         }
     }
-}
-void field::action(event ev)
-{
 }
 int field::getLength()
 {
